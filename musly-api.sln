@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.810.20
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "musly-api", "musly-api\musly-api.csproj", "{838E5C59-FDCB-4A58-AA25-A1B6DE344B13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{838E5C59-FDCB-4A58-AA25-A1B6DE344B13}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{838E5C59-FDCB-4A58-AA25-A1B6DE344B13}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{838E5C59-FDCB-4A58-AA25-A1B6DE344B13}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{838E5C59-FDCB-4A58-AA25-A1B6DE344B13}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {70D3C373-FB71-4B76-85EE-CB71E51DC046}
+	EndGlobalSection
+EndGlobal
