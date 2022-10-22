@@ -8,6 +8,8 @@
 ### Copy source list into docker image
 `docker cp sources.list 3d38aa158473:/etc/apt/`
 
+`docker cp microsoft-prod.list 3d38aa158473:/etc/apt/sources.list.d/
+
 ### Install new version of .net core
 `apt-get install -y dotnet-sdk-6.0`
 
