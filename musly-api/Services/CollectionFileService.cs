@@ -4,7 +4,10 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
+//using CMTZ.Entities;
 using Microsoft.Extensions.Configuration;
+using musly_api.Model;
 
 namespace musly_api.Services
 {
@@ -15,7 +18,7 @@ namespace musly_api.Services
         public CollectionFileService(IConfiguration config)
         {
             _config = config;
-            NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), ImportResolver);
+            //NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), ImportResolver);
         }
 
         const string MUSLY_LIB = "/usr/local/bin/musly";
@@ -36,12 +39,19 @@ namespace musly_api.Services
         [DllImport(MUSLY_LIB)]
         public static extern int musly_track_frombin(IntPtr jukebox, byte[] from_buffer, IntPtr to_track);
 
+        [DllImport(MUSLY_LIB)]
+        public static extern int musly_track_analyze_audiofile(IntPtr jukebox, [MarshalAs(UnmanagedType.LPStr)] string audioData, float length, float start, IntPtr features);
+
+        [DllImport(MUSLY_LIB)]
+        public static extern int musly_track_size(IntPtr jukebox);
+
+
         private static IntPtr ImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
             IntPtr libHandle = IntPtr.Zero;
             if (libraryName == MUSLY_LIB)
             {
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
                     Console.WriteLine("Loading Windows Musly Library");
                     NativeLibrary.TryLoad(MUSLY_LIB_WIN, assembly, DllImportSearchPath.System32, out libHandle);
@@ -61,6 +71,16 @@ namespace musly_api.Services
 
         public List<IntPtr> tracks { get; set; }
 
+        private IntPtr jukeboxPtr { get; set; }
+
+
+
+        public void InitializeJukebox()
+        {
+
+             this.jukeboxPtr = musly_jukebox_poweron(null, null);
+
+        }
 
         public int readCollectionFile(String cfile, char mode, string[] tracks, string[] tracksFiles)
         {
@@ -128,18 +148,10 @@ namespace musly_api.Services
             int count = 0;
             List<String> track = new List<string>();
             List<IntPtr> muslyTracks = new List<IntPtr>();
-            //List<MuslyTrack> mTracks = new List<MuslyTrack>();
 
 
             using (var stream = File.Open(cfile, FileMode.Open))
             {
-                /*using (var reader = new BinaryReader(stream, Encoding.UTF8, false))
-                {
-                    //byte[] buffer = reader.ReadBytes(bufferSize);
-                    //string headerString = Encoding.Default.GetString(buffer);
-                    //readAscii(reader);
-
-                }*/
                 
                 SeekOrigin seekOrigin = new SeekOrigin();
                 stream.Seek(15, seekOrigin);
@@ -157,7 +169,6 @@ namespace musly_api.Services
                     {
                         this.trackFiles = track;
                         this.tracks = muslyTracks;
-                        //this.muslyTracksList = mTracks;
                         //musly_track_free(mt);
 
                         return count;
@@ -175,7 +186,6 @@ namespace musly_api.Services
                     }
 
                     bytesRead = stream.Read(buffer, 0, buffer.Length);
-                    //Console.WriteLine(file);
 
                     var currentMt = musly_track_alloc(jukebox);
                     int byteRead = musly_track_frombin(jukebox, buffer, currentMt);
@@ -185,14 +195,8 @@ namespace musly_api.Services
                     {
                         track.Add(file);
                         muslyTracks.Add(currentMt);
-                        //mTracks.Add(muslyTrack);
                     }
 
-                    /*while ((bytesRead = stream.Read(buffer,0, buffer.Length)) > 0)
-                    {
-                        string headerString = Encoding.Default.GetString(buffer);
-
-                    }*/
                     count++;
                 }
 
@@ -215,6 +219,77 @@ namespace musly_api.Services
             }
             return Encoding.ASCII.GetString(strBytes.ToArray());
 
+        }
+
+        /*public async Task<TrackInfo[]> ProcessTrackInfo(List<Track> tracks)
+        {
+            InitializeJukebox();
+            List<Task<TrackInfo>> trackinfoList = new List<Task<TrackInfo>>();
+
+            //for (int i = 0; i < tracks.Count; i++)
+            foreach(var track in tracks)
+            {
+                //var track = tracks[i];
+
+
+                trackinfoList.Add(PopulateTrack(track));
+            }
+
+            return await Task.WhenAll<TrackInfo>(trackinfoList);
+        }*/
+
+        /*public async Task<TrackInfo> PopulateTrack(Track track)
+        {
+            //float[] audioFeatures = ExtractFeatures(track.TrackURL);
+            TrackInfo trackInfo = new TrackInfo();
+            trackInfo.Url = track.TrackURL;
+            //trackInfo.Id = track.Id.ToString();
+            trackInfo.Title = track.TrackTitle;
+            trackInfo.Artist = track.Album.Artists;
+            trackInfo.Description = track.Album.Description;
+            trackInfo.AlbumTitle = track.Album.Title;
+
+            //trackInfo.AudioFeatures = audioFeatures;
+            return trackInfo;
+        }*/
+
+        public float[] ExtractFeatures(string filePath)
+        {
+            IntPtr trackPtr = musly_track_alloc(this.jukeboxPtr);
+            int bytes = musly_track_binsize(this.jukeboxPtr);
+            int trackSize = musly_track_size(this.jukeboxPtr) / sizeof(float);
+            float[] track = new float[trackSize];
+            Console.WriteLine("$\"Extracting features from " + filePath);
+
+
+
+            try
+            {
+
+                int result = musly_track_analyze_audiofile(
+                        this.jukeboxPtr,
+                        filePath,
+                        30f,
+                        0f,
+                        trackPtr
+                    );
+
+                if (result != 0)
+                {
+                    Console.WriteLine("$\"Failed to extract features from " + filePath);
+                    return track;
+                }
+
+                Marshal.Copy(trackPtr, track, 0, trackSize);
+
+
+                return track;
+            }
+            finally
+            {
+                // Always free unmanaged memory
+                Marshal.FreeHGlobal(trackPtr);
+            }
         }
     }
 
@@ -242,26 +317,27 @@ namespace musly_api.Services
     [StructLayout(LayoutKind.Sequential)]
     public struct MuslyTrack
     {
-        public MuslyTrack(float value)
+        /*public MuslyTrack(float[] value)
         {
             this.realValue = value;
-        }
+        }*/
 
-        private float realValue;
-        public static implicit operator float(MuslyTrack value)
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 351)]
+        public float[] realValue;
+        /*public static implicit operator float[](MuslyTrack value)
         {
             return value.realValue;
         }
 
-        public static implicit operator MuslyTrack(float value)
+        public static implicit operator MuslyTrack(float[] value)
         {
             return new MuslyTrack(value);
         }
 
-        public float getFloat()
+        public float[] getFloat()
         {
             return realValue;
-        }
+        }*/
     }
 
     [StructLayout(LayoutKind.Sequential)]

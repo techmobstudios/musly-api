@@ -10,10 +10,24 @@
     <None Remove="Services\" />
     <None Remove="Helpers\" />
     <None Remove="Model\" />
+    <None Remove="Model\CMTZ\" />
+    <None Remove="Model\CMTZ\Enums\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
     <Folder Include="Helpers\" />
     <Folder Include="Model\" />
+    <Folder Include="Model\CMTZ\" />
+    <Folder Include="Model\CMTZ\Enums\" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="wwwroot\musly\.export.swp" />
+    <Content Remove="wwwroot\musly\export" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="NEST" Version="7.17.5" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="8.0.7" />
   </ItemGroup>
 </Project>

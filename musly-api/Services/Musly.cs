@@ -8,7 +8,7 @@ public class Musly
 
     static Musly()
     {
-        NativeLibrary.SetDllImportResolver(typeof(Musly).Assembly, ImportResolver);
+
     }
 
     private static IntPtr ImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)

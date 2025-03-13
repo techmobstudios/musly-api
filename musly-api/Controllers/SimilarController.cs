@@ -9,11 +9,11 @@ namespace musly_api.Controllers
     [Route("[controller]")]
     public class SimilarController : ControllerBase
     {
-        private MuslyService MuslyService { get; set; }
+        private TimbreService TimbreService { get; set; }
 
-        public SimilarController(MuslyService muslyService)
+        public SimilarController(TimbreService timbreService)
         {
-            MuslyService = muslyService;
+            TimbreService = timbreService;
         }
 
         [HttpGet]
@@ -24,7 +24,7 @@ namespace musly_api.Controllers
                 count = 25;
             }
 
-            return MuslyService.timbreSimilarity(track, count.Value);
+            return TimbreService.timbreSimilarity(track, count.Value);
         }
     }
 }

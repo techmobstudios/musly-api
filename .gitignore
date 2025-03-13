@@ -401,5 +401,8 @@ ASALocalRun/
 # MFractors (Xamarin productivity tool) working folder
 .mfractor/
 
+musly-api/libmusly.dylib
+musly-api/libmusly_resample.dylib
+
 # Local History for Visual Studio
 .localhistory/

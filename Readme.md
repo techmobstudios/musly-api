@@ -3,6 +3,9 @@
 ## Docker Image Deploy
 `docker build -t rlshaw/musly-api .`
 
+`docker build -t rlshaw/musly-api:latest -t rlshaw/musly-api:v2.1 .`
+
+
 ## Update Docker Image
 
 ### Copy source list into docker image

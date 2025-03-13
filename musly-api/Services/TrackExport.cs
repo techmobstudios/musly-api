@@ -1,73 +1,79 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-//using CMTZ.Common;
+//using CMTZ.Services;
 //using CMTZ.Entities;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Routing;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using musly_api.Model;
-using musly_api.Services;
+using System.Threading.Tasks;
+using System.Text.Json;
+using System.IO;
+using Microsoft.AspNetCore.Hosting;
 using Nest;
 //using Newtonsoft.Json.Linq;
 //using Newtonsoft.Json.Serialization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.Linq;
+using musly_api.Model;
+//using CMTZ.Common;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
 
-namespace musly_api.Controllers
+namespace musly_api.Services
 {
-    [ApiController]
-    [Route("[controller]")]
-    public class SongsController : ControllerBase
-    {
-
-        public MuslyService _muslyService { get; set; }
-
-        public TrackExport _trackEport { get; set; }
-
-        //AppSettings Configuration { get; set; }
+	public class TrackExport
+	{
+       /* public DTrackService DTrackService { get; }
+        IHostingEnvironment _environment { get; }
+        public CollectionFileService _cf { get; }
+        AppSettings Configuration { get; set; }
 
 
-        public SongsController(ILogger<SongsController> logger, MuslyService muslyService /*, TrackExport trackExport , IOptions<AppSettings> appsettings*/)
-        {
-            _muslyService = muslyService;
-            //_trackEport = trackExport;
-            //Configuration = appsettings.Value;
+
+        public TrackExport(DTrackService _DTrackService, IHostingEnvironment environment, CollectionFileService cf, IOptions<AppSettings> appsettings)
+		{
+            DTrackService = _DTrackService;
+            _environment = environment;
+            _cf = cf;
+            Configuration = appsettings.Value;
 
         }
 
-        [HttpGet]
-        public IEnumerable<String> Get(string query= "bigx")
-        {
-            return _muslyService.cf.trackFiles.AsEnumerable().Where(x => x.Contains(query, StringComparison.OrdinalIgnoreCase));
+        static Newtonsoft.Json.JsonSerializer pascalCaseSerializer = Newtonsoft.Json.JsonSerializer.Create(
+            new Newtonsoft.Json.JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver()
+            });
+
+        public async Task<IEnumerable<TrackInfo>> Run()
+		{
+
+            var tracks = await DTrackService.GetAllTracks();
+
+            var tracksEnum = tracks.Select(GetTrack);
+
+
+            TrackInfo[] trackInfoList = await _cf.ProcessTrackInfo(tracksEnum.ToList());
+
+            return trackInfoList;
+
         }
 
-        //[HttpPost]
-        //public Task<IEnumerable<TrackInfo>> Search(string[] songs)
-        //{
-            //return _muslyService.cf.trackFiles.AsEnumerable().Where(x => x.Contains(query, StringComparison.OrdinalIgnoreCase));
-        //}
-
-        /*[HttpGet("export")]
-        public async Task<IEnumerable<TrackInfo>> Export()
-        {
-            //var result = new musly_api.Model.Result { };
-            var tracks = await _trackEport.Run();
-            //var trackList = tracks.Where(t => t.Album.GenreTypeCode == 2);
-            //result.ResponseObject = trackList;
-            //var error = JObject.FromObject(result, pascalCaseSerializer);
-            //var eObj = new PResult { obj = error };
-            return tracks;
-         
-        }
-
-        [HttpGet("process")]
         public async Task<IEnumerable<TrackInfo>> Process()
         {
-            return await _trackEport.Process();
-            //return tracks.Select(GetTrack);
+
+            String jsonFile = Path.Combine(_environment.WebRootPath, "musly") + Path.DirectorySeparatorChar + "all_tracks.json";
+
+            string jsonData = File.ReadAllText(jsonFile);
+            IEnumerable<Track> tracks = JsonSerializer.Deserialize<IEnumerable<Track>>(jsonData, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            });
+
+            var tracksEnum = tracks.Select(GetTrack);
+
+
+            TrackInfo[] trackInfoList = await _cf.ProcessTrackInfo(tracksEnum.ToList());
+
+            return trackInfoList;
+
         }
 
         private Track GetTrack(Track track)
@@ -149,5 +155,7 @@ namespace musly_api.Controllers
                 return album;
             }
         }*/
+
     }
 }
+

@@ -12,6 +12,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using musly_api.Services;
 using Microsoft.AspNetCore.Hosting;
+//using CMTZ.Data;
+//using CMTZ.Services;
+//using Microsoft.EntityFrameworkCore;
+//using CMTZ.Common;
+//using Genbox.SimpleS3.Core;
+//using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace musly_api
 {
@@ -19,7 +27,12 @@ namespace musly_api
     {
         public Startup(IConfiguration configuration, Microsoft.AspNetCore.Hosting.IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            Configuration = builder.Build();
             _env = env;
         }
 
@@ -36,6 +49,35 @@ namespace musly_api
 
             MuslyService muslyService = new MuslyService(new CollectionFileService(Configuration), Configuration, _env);
             services.AddSingleton(muslyService);
+
+            TimbreService timbreService = new TimbreService(muslyService);
+            services.AddSingleton(muslyService);
+
+            var connString = Configuration.GetConnectionString("DefaultConnection");
+
+            // SQL Server
+            //services.AddDbContext<ApplicationDbContext>(options =>
+            //   options.UseSqlServer(connString));
+
+            //var appSettings = new AppSettings();
+            //Configuration.GetSection(nameof(AppSettings)).Bind(appSettings);
+            //services.AddSingleton(appSettings);
+
+            //services.AddTransient<TrackExport>();
+            //services.AddTransient<DTrackService>();
+
+
+            // Pascal Case Responses
+            services.AddControllers().AddJsonOptions(o => {
+                o.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                o.JsonSerializerOptions.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals;
+                // o.JsonSerializerOptions.PropertyNamingPolicy = null;
+            });
+
+
+            //services.AddTransient<DTrackRepository>();
+
+            //services.Configure<AppSettings>(options => Configuration.GetSection("AppSettings").Bind(options));
 
 
         }
