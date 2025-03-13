@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using musly_api.Model;
+using musly_api.Model.CMTZ;
 using musly_api.Services;
 using Nest;
 //using Newtonsoft.Json.Linq;
@@ -27,12 +28,14 @@ namespace musly_api.Controllers
 
         public TrackExport _trackEport { get; set; }
 
+        public SearchService _searchService { get; set; }
         //AppSettings Configuration { get; set; }
 
 
-        public SongsController(ILogger<SongsController> logger, MuslyService muslyService /*, TrackExport trackExport , IOptions<AppSettings> appsettings*/)
+        public SongsController(ILogger<SongsController> logger, MuslyService muslyService, SearchService searchService /*, TrackExport trackExport , IOptions<AppSettings> appsettings*/)
         {
             _muslyService = muslyService;
+            _searchService = searchService;
             //_trackEport = trackExport;
             //Configuration = appsettings.Value;
 
@@ -44,10 +47,16 @@ namespace musly_api.Controllers
             return _muslyService.cf.trackFiles.AsEnumerable().Where(x => x.Contains(query, StringComparison.OrdinalIgnoreCase));
         }
 
+        [HttpGet("search")]
+        public DSearchResult<Track> Search(string query = "bigx")
+        {
+            return _searchService.SearchTracks(query, 1, 10);
+        }
+
         //[HttpPost]
         //public Task<IEnumerable<TrackInfo>> Search(string[] songs)
         //{
-            //return _muslyService.cf.trackFiles.AsEnumerable().Where(x => x.Contains(query, StringComparison.OrdinalIgnoreCase));
+        //return _muslyService.cf.trackFiles.AsEnumerable().Where(x => x.Contains(query, StringComparison.OrdinalIgnoreCase));
         //}
 
         /*[HttpGet("export")]

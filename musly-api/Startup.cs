@@ -62,6 +62,8 @@ namespace musly_api
             //var appSettings = new AppSettings();
             //Configuration.GetSection(nameof(AppSettings)).Bind(appSettings);
             //services.AddSingleton(appSettings);
+            services.AddTransient<SearchService>();
+
 
             //services.AddTransient<TrackExport>();
             //services.AddTransient<DTrackService>();
