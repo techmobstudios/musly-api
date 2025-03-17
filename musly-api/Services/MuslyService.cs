@@ -160,7 +160,12 @@ namespace musly_api.Services
         }
 
 
-        const string MUSLY_LIB = "/usr/local/bin/musly";
+        // Mac
+        //const string MUSLY_LIB = "/usr/local/bin/musly";
+
+        // Windows
+        const string MUSLY_LIB = "C:\\Program Files (x86)\\musly\\bin\\libmusly.dll";
+
 
         [DllImport(MUSLY_LIB)]
         public static extern IntPtr musly_jukebox_fromfile([MarshalAs(UnmanagedType.LPStr)] string jukebox);

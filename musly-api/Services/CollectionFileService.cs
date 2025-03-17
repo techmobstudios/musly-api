@@ -21,9 +21,11 @@ namespace musly_api.Services
             //NativeLibrary.SetDllImportResolver(Assembly.GetExecutingAssembly(), ImportResolver);
         }
 
-        const string MUSLY_LIB = "/usr/local/bin/musly";
+        // Mac
+        //const string MUSLY_LIB = "/usr/local/bin/musly";
 
-        const string MUSLY_LIB_WIN = "C:\\Program Files (x86)\\musly\\bin\\libmusly.dll";
+        // Windows
+        const string MUSLY_LIB = "C:\\Program Files (x86)\\musly\\bin\\libmusly.dll";
 
 
         [DllImport(MUSLY_LIB)]

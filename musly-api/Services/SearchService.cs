@@ -18,14 +18,17 @@ namespace musly_api.Services
             var node = new Uri("http://localhost:9200");
             var settings = new ConnectionSettings(node).DisableDirectStreaming();
             settings.DefaultIndex("tracks");
+            settings.RequestTimeout(TimeSpan.FromSeconds(600));
+            settings.BasicAuthentication("elastic", "Rocket489!");
+
 
             var client = new ElasticClient(settings);
             var start = (currentPage - 1) * itemsPerPage;
             var finish = itemsPerPage;
-            //var query = criteria.TrackTitle;
 
             var response = client.Search<Track>(s => s
-                                  .Query(q => q.QueryString(qs => qs.Query(query).DefaultField("_all")
+                                  .Query(q => q.QueryString(qs =>
+                                       qs.Query(query)
                                    ))
                                    .Sort(ss =>
                                        ss.Descending(SortSpecialField.Score)

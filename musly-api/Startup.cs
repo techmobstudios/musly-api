@@ -19,7 +19,8 @@ using Microsoft.AspNetCore.Hosting;
 //using Genbox.SimpleS3.Core;
 //using Newtonsoft.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
-
+using Microsoft.OpenApi.Models;
+using StackExchange.Redis;
 
 namespace musly_api
 {
@@ -54,6 +55,11 @@ namespace musly_api
             services.AddSingleton(muslyService);
 
             var connString = Configuration.GetConnectionString("DefaultConnection");
+            services.AddSingleton<IConnectionMultiplexer>(sp =>
+            {
+                var configuration = sp.GetRequiredService<IConfiguration>();
+                return ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
+            });
 
             // SQL Server
             //services.AddDbContext<ApplicationDbContext>(options =>
@@ -63,6 +69,7 @@ namespace musly_api
             //Configuration.GetSection(nameof(AppSettings)).Bind(appSettings);
             //services.AddSingleton(appSettings);
             services.AddTransient<SearchService>();
+            services.AddSwaggerGen();
 
 
             //services.AddTransient<TrackExport>();
@@ -102,6 +109,7 @@ namespace musly_api
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapSwagger();
             });
         }
     }

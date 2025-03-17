@@ -4,7 +4,12 @@ using System.Runtime.InteropServices;
 
 public class Musly
 {
-    const string MUSLY_LIB = "/usr/local/bin/musly";
+    // Mac
+    //const string MUSLY_LIB = "/usr/local/bin/musly";
+
+    // Windows
+    const string MUSLY_LIB = "C:\\Program Files (x86)\\musly\\bin\\libmusly.dll";
+
 
     static Musly()
     {

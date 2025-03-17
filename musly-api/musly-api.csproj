@@ -12,6 +12,7 @@
     <None Remove="Model\" />
     <None Remove="Model\CMTZ\" />
     <None Remove="Model\CMTZ\Enums\" />
+    <None Remove="Repository\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Services\" />
@@ -19,6 +20,7 @@
     <Folder Include="Model\" />
     <Folder Include="Model\CMTZ\" />
     <Folder Include="Model\CMTZ\Enums\" />
+    <Folder Include="Repository\" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
@@ -29,5 +31,7 @@
   <ItemGroup>
     <PackageReference Include="NEST" Version="7.17.5" />
     <PackageReference Include="X.PagedList.Mvc.Core" Version="8.0.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.1" />
+    <PackageReference Include="StackExchange.Redis" Version="2.8.31" />
   </ItemGroup>
 </Project>
