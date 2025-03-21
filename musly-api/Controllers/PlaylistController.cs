@@ -41,8 +41,9 @@ namespace musly_api.Controllers
 
             var playlists = await _playlistRepo.GetAllTracks();
 
-            return playlists.Take(count.Value);
+            return playlists.OrderByDescending(p=> p.CreatedOn).Take(count.Value);
         }
+
 
         [HttpGet("{playlistId}")]
         public Task<Playlist> GetPlaylistById(string playlistId)
@@ -50,13 +51,13 @@ namespace musly_api.Controllers
             return _playlistRepo.GetPlaylistById(playlistId);
         }
 
+
         [HttpPost]
         public async Task<Playlist> CreatePlaylist([FromBody] PlaylistPost request)
         {
             var results = new ConcurrentBag<IEnumerable<Track>>();
             var tracks = new List<Track>();
             var playlist = new Playlist();
-
 
 
             Parallel.ForEach(request.songs, q =>
@@ -70,16 +71,17 @@ namespace musly_api.Controllers
             resultList.ForEach(l => {
                 tracks.AddRange(l);
             });
-            //return _searchService.SearchTracks(query, 1, 10);
+
             playlist.Id = Guid.NewGuid().ToString();
-            playlist.Tracks =  tracks.Select(GetTrack);
+            playlist.Tracks = tracks.Select(GetTrack);
             playlist.Title = request.title;
             playlist.CreatedOn = DateTime.Now;
+            playlist.PlaylistUrl = @"https://www.certifiedmixtapez.com/ai-playlists/" + playlist.Id;
             await _playlistRepo.SaveTrack(playlist);
 
             return playlist;
         }
-
+        
 
         private Track GetTrack(Track track)
         {
@@ -169,6 +171,7 @@ namespace musly_api.Controllers
     public class PlaylistPost
     {
         public string title { get; set; }
+        public string description { get; set; }
         public List<string> songs { get; set; }
     }
 }

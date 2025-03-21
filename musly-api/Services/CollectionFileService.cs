@@ -48,7 +48,7 @@ namespace musly_api.Services
         public static extern int musly_track_size(IntPtr jukebox);
 
 
-        private static IntPtr ImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
+        /*private static IntPtr ImportResolver(string libraryName, Assembly assembly, DllImportSearchPath? searchPath)
         {
             IntPtr libHandle = IntPtr.Zero;
             if (libraryName == MUSLY_LIB)
@@ -60,7 +60,7 @@ namespace musly_api.Services
                 }
             }
             return libHandle;
-        }
+        }*/
 
         string VERSION = "0";
         string HEADER = "MUSLY";

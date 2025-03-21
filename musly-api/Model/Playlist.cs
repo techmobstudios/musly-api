@@ -10,6 +10,10 @@ namespace musly_api.Model
 
         public string Title { get; set; }
 
+        public string PlaylistUrl { get; set; }
+
+        public string Description { get; set; }
+
         public IEnumerable<Track> Tracks { get; set; }
 
         public DateTime CreatedOn { get; set; }

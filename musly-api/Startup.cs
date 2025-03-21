@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
+using musly_api.Repository;
 
 namespace musly_api
 {
@@ -61,6 +62,37 @@ namespace musly_api
                 return ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis"));
             });
 
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost");
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "certifiedmixtapez.com");
+                        builder.SetIsOriginAllowed(origin => new Uri(origin).Host == "certifiedmixtapes.com");
+
+                        builder.WithOrigins(
+                            "http://certifiedmixtapez.com",
+                            "http://www.certifiedmixtapez.com",
+                            "https://certifiedmixtapez.com",
+                            "https://www.certifiedmixtapez.com",
+                            "http://certifiedmixtapes.com",
+                            "http://www.certifiedmixtapes.com",
+                            "https://certifiedmixtapes.com",
+                            "https://www.certifiedmixtapes.com",
+                            "https://beta.certifiedmixtapes.com",
+                            "https://embed.certifiedmixtapez.com",
+                            "https://cmtz-widget.pages.dev",
+                            "https://certifiedmixtapes-eepvd.ondigitalocean.app",
+                            "https://ricky-shaw-client-app-default.layer0-limelight.link",
+                            "http://local.certifiedmixtap.es:4200",
+                            "http://localhost:4200"
+                            )
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                    });
+            });
+
             // SQL Server
             //services.AddDbContext<ApplicationDbContext>(options =>
             //   options.UseSqlServer(connString));
@@ -69,6 +101,7 @@ namespace musly_api
             //Configuration.GetSection(nameof(AppSettings)).Bind(appSettings);
             //services.AddSingleton(appSettings);
             services.AddTransient<SearchService>();
+            services.AddTransient<RedisPlaylistRepository>();
             services.AddSwaggerGen();
 
 
@@ -105,6 +138,8 @@ namespace musly_api
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseCors();
 
             app.UseEndpoints(endpoints =>
             {
